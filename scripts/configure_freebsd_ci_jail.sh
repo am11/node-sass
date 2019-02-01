@@ -4,6 +4,9 @@ set -o xtrace
 
 jailName=$1
 skelDirectory=$2
+cbsd_workdir=/usr/jails
+jail_arch="i386"
+jail_ver="11.2"
 
 echo "Installing build dependencies for cbsd"
 pkg install -y libssh2 rsync sqlite3 git pkgconf
@@ -21,11 +24,11 @@ pw useradd cbsd -s /bin/sh -d /nonexistent -c "cbsd user"
 echo "Writing 'FreeBSD-bases' configuration file"
 cd /tmp
 ln -s /usr/local/cbsd/etc
-cat > /tmp/etc/FreeBSD-bases.conf << EOF
+cat > ${cbsd_workdir}/etc/FreeBSD-bases.conf << EOF
 auto_baseupdate=0
 default_obtain_base_method="extract repo"
 default_obtain_base_extract_source="/usr/freebsd-dist/base.txz"
-default_obtain_base_repo_sources="https://bintray.com/am11/freebsd-dist/download_file?file_path=base-11.2-i386.txz"
+default_obtain_base_repo_sources="https://bintray.com/am11/freebsd-dist/download_file?file_path=base-${jail_ver}-${jail_arch}.txz"
 EOF
 
 # determine uplink ip address
@@ -37,8 +40,6 @@ if [ -z "${my_ipv4}" ]; then
 	echo "IPv4 not detected"
 	exit 1
 fi
-
-cbsd_workdir=/usr/jails
 
 echo "Writing '${jailName}' configuration file"
 cat > /tmp/${jailName}.jconf << EOF
@@ -52,10 +53,10 @@ allow_devfs="1"
 allow_nullfs="1"
 allow_raw_sockets="1"
 mount_fstab="${cbsd_workdir}/jails-fstab/fstab.${jailName}"
-arch="i386"
+arch="${jail_arch}"
 mkhostsfile="1"
 devfs_ruleset="4"
-ver="11.2"
+ver="${jail_ver}"
 basename=""
 baserw="0"
 mount_src="0"
@@ -89,7 +90,7 @@ echo "Initializing cbsd environment"
 env workdir=${cbsd_workdir} /usr/local/cbsd/sudoexec/initenv /usr/local/cbsd/share/initenv.conf
 
 echo "Creating ${jailName}"
-cbsd jcreate jconf=/tmp/${jailName}.jconf inter=0 arch=i386
+cbsd jcreate jconf=/tmp/${jailName}.jconf inter=0
 cbsd jailscp /etc/resolv.conf ${jailName}:/etc/resolv.conf
 
 echo "${jailName} created"
