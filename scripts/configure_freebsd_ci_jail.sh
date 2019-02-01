@@ -90,7 +90,7 @@ echo "Creating ${jailName}"
 cbsd jcreate jconf=/tmp/${jailName}.jconf inter=0
 cbsd jailscp /etc/resolv.conf ${jailName}:/etc/resolv.conf
 
-cat > ~cbsd/jails/jails-fstab/fstab.${jailName}.local <<EOF
+cat > ~cbsd/jails-fstab/fstab.${jailName}.local <<EOF
 ${skelDirectory} /etc/skel nullfs rw 0 0
 EOF
 
