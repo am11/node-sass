@@ -19,7 +19,7 @@ ln -sf /usr/local/cbsd/rc.d/cbsdd
 mkdir -p /usr/local/libexec/bsdconfig
 cd /usr/local/libexec/bsdconfig
 ln -s /usr/local/cbsd/share/bsdconfig/cbsd
-pw useradd cbsd -s /bin/sh -d /nonexistent -c "cbsd user"
+pw useradd cbsd -s /bin/sh -d ${cbsd_workdir} -c "cbsd user"
 
 # determine uplink ip address
 # determine uplink iface
