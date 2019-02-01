@@ -94,6 +94,6 @@ cbsd jailscp /etc/resolv.conf ${jailName}:/etc/resolv.conf
 echo "${jailName} created"
 
 echo "mount skel directory"
-[ ! -d ~cbsd/jails/${jailName}/etc/skel ] && mkdir ~cbsd/jails/${jailName}/etc/skel
+[ ! -d ~cbsd/jails/${jailName}/etc/skel ] && mkdir -p ~cbsd/jails/${jailName}/etc/skel
 mount_nullfs -orw ${skelDirectory} ~cbsd/jails/${jailName}/etc/skel
 cd /etc/skel
