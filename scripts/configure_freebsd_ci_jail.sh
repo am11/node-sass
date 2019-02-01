@@ -21,16 +21,6 @@ cd /usr/local/libexec/bsdconfig
 ln -s /usr/local/cbsd/share/bsdconfig/cbsd
 pw useradd cbsd -s /bin/sh -d /nonexistent -c "cbsd user"
 
-echo "Writing 'FreeBSD-bases' configuration file"
-cd /tmp
-ln -s /usr/local/cbsd/etc
-cat > ${cbsd_workdir}/etc/FreeBSD-bases.conf << EOF
-auto_baseupdate=0
-default_obtain_base_method="extract repo"
-default_obtain_base_extract_source="/usr/freebsd-dist/base.txz"
-default_obtain_base_repo_sources="https://bintray.com/am11/freebsd-dist/download_file?file_path=base-${jail_ver}-${jail_arch}.txz"
-EOF
-
 # determine uplink ip address
 # determine uplink iface
 auto_iface=$( /sbin/route -n get 0.0.0.0 |/usr/bin/awk '/interface/{print $2}' )
@@ -88,6 +78,14 @@ EOF
 
 echo "Initializing cbsd environment"
 env workdir=${cbsd_workdir} /usr/local/cbsd/sudoexec/initenv /usr/local/cbsd/share/initenv.conf
+
+echo "Writing 'FreeBSD-bases' configuration file"
+cat > ${cbsd_workdir}/etc/FreeBSD-bases.conf << EOF
+auto_baseupdate=0
+default_obtain_base_method="extract repo"
+default_obtain_base_extract_source="/usr/freebsd-dist/base.txz"
+default_obtain_base_repo_sources="https://bintray.com/am11/freebsd-dist/download_file?file_path=base-${jail_ver}-${jail_arch}.txz"
+EOF
 
 echo "Creating ${jailName}"
 cbsd jcreate jconf=/tmp/${jailName}.jconf inter=0
