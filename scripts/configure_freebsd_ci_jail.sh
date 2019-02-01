@@ -73,7 +73,6 @@ interface="0"
 jailskeldir="$skelDirectory"
 exec_start="/bin/sh /etc/rc"
 exec_stop="/bin/sh /etc/rc.shutdown"
-runasap="1"	# run upon jail create
 EOF
 
 echo "Initializing cbsd environment"
@@ -91,9 +90,17 @@ echo "Creating ${jailName}"
 cbsd jcreate jconf=/tmp/${jailName}.jconf inter=0
 cbsd jailscp /etc/resolv.conf ${jailName}:/etc/resolv.conf
 
+cat > ~cbsd/jails/jails-fstab/fstab.${jailName}.local <<EOF
+${skelDirectory} /etc/skel nullfs rw 0 0
+EOF
+
+cbsd jstart jname=${jailName} inter=0
+
 echo "${jailName} created"
 
-echo "mount skel directory"
-[ ! -d ~cbsd/jails/${jailName}/etc/skel ] && mkdir -p ~cbsd/jails/${jailName}/etc/skel
-mount_nullfs -orw ${skelDirectory} ~cbsd/jails/${jailName}/etc/skel
+cbsd jexec jname=${jailName} ls -la /etc/skel/
+
+#echo "mount skel directory"
+#[ ! -d ~cbsd/jails/${jailName}/etc/skel ] && mkdir -p ~cbsd/jails/${jailName}/etc/skel
+#mount_nullfs -orw ${skelDirectory} ~cbsd/jails/${jailName}/etc/skel
 cd /etc/skel
