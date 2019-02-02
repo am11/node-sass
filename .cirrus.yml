@@ -31,6 +31,7 @@ freebsd_build_task:
         ./scripts/configure_freebsd_ci_jail.sh $jailName $CIRRUS_WORKING_DIR;
         $execPrefix sed -i -- '' 's/quarterly/latest/g' /etc/pkg/FreeBSD.conf; # use latest ports
         $execPrefix pkg update -f;
+        $execPrefix pkg install -y python2 > /dev/null
       else
         sed -i '' 's/quarterly/latest/g' /etc/pkg/FreeBSD.conf; # use latest ports
       fi
@@ -42,8 +43,11 @@ freebsd_build_task:
     - $execPrefix clang++ --version
 
   build_script:
-    - $execPrefix ls  # debug
-    - $execPrefix npm install --unsafe-perm # kicks in the build step and invokes clang via gyp machinery
+    - |
+      if test "$abi" = "freebsd:11:x86:32"; then
+        changeDir="cd /etc/skel &&"
+      fi
+      echo "$changeDir npm install --unsafe-perm" | $execPrefix /bin/sh
 
 publish_task:
   only_if: '!!$CIRRUS_TAG'

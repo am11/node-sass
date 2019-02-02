@@ -97,10 +97,3 @@ EOF
 cbsd jstart jname=${jailName} inter=0
 
 echo "${jailName} created"
-
-cbsd jexec jname=${jailName} ls -la /etc/skel/
-
-#echo "mount skel directory"
-#[ ! -d ~cbsd/jails/${jailName}/etc/skel ] && mkdir -p ~cbsd/jails/${jailName}/etc/skel
-#mount_nullfs -orw ${skelDirectory} ~cbsd/jails/${jailName}/etc/skel
-cd /etc/skel
