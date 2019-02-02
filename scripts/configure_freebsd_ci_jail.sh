@@ -15,10 +15,10 @@ echo "Clone and setup cbsd"
 git clone https://github.com/cbsd/cbsd.git /usr/local/cbsd --single-branch --branch develop --depth 1
 
 cd /usr/local/etc/rc.d
-ln -sf /usr/local/cbsd/rc.d/cbsdd
+ln -sf /usr/local/cbsd/rc.d/cbsdd .
 mkdir -p /usr/local/libexec/bsdconfig
 cd /usr/local/libexec/bsdconfig
-ln -s /usr/local/cbsd/share/bsdconfig/cbsd
+ln -s /usr/local/cbsd/share/bsdconfig/cbsd .
 pw useradd cbsd -s /bin/sh -d ${cbsd_workdir} -c "cbsd user"
 
 # determine uplink ip address
@@ -32,7 +32,7 @@ if [ -z "${my_ipv4}" ]; then
 fi
 
 echo "Writing '${jailName}' configuration file"
-cat > /tmp/${jailName}.jconf << EOF
+cat > "/tmp/${jailName}.jconf" << EOF
 jname="${jailName}"
 path="${cbsd_workdir}/${jailName}"
 host_hostname="${jailName}.my.domain"
@@ -87,13 +87,13 @@ default_obtain_base_repo_sources="https://bintray.com/am11/freebsd-dist/download
 EOF
 
 echo "Creating ${jailName}"
-cbsd jcreate jconf=/tmp/${jailName}.jconf inter=0
-cbsd jailscp /etc/resolv.conf ${jailName}:/etc/resolv.conf
+cbsd jcreate jconf="/tmp/${jailName}.jconf" inter=0
+cbsd jailscp /etc/resolv.conf "${jailName}":/etc/resolv.conf
 
-cat > ~cbsd/jails-fstab/fstab.${jailName}.local <<EOF
+cat > "~cbsd/jails-fstab/fstab.${jailName}.local" <<EOF
 ${skelDirectory} /etc/skel nullfs rw 0 0
 EOF
 
-cbsd jstart jname=${jailName} inter=0
+cbsd jstart jname="${jailName}" inter=0
 
 echo "${jailName} created"

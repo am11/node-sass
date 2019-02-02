@@ -32,11 +32,11 @@ freebsd_build_task:
     - |
       if test "$abi" = "freebsd:11:x86:32"; then
         ./scripts/configure_freebsd_ci_jail.sh $jailName $CIRRUS_WORKING_DIR;
-        $execPrefix sed -i -- '' 's/quarterly/latest/g' /etc/pkg/FreeBSD.conf; # use latest ports
+        $execPrefix sed -i -- '' 's/quarterly/latest/g' /etc/pkg/FreeBSD.conf;
         $execPrefix pkg update -f;
         $execPrefix pkg install -y python2 > /dev/null
       else
-        sed -i '' 's/quarterly/latest/g' /etc/pkg/FreeBSD.conf; # use latest ports
+        sed -i '' 's/quarterly/latest/g' /etc/pkg/FreeBSD.conf;
       fi
     - $execPrefix pkg install -y c-ares gmake icu libnghttp2 libuv git > /dev/null
     - $execPrefix pkg add http://pkg.freebsd.org/$abi/latest/All/$nodeArchive.txz
@@ -58,7 +58,7 @@ freebsd_build_task:
         for file in `ls vendor/**/*.node`; do
           parent=${file%/*};
           name=${parent##*/};
-          fullyQualifiedName="$pwd/$parent/${name}_binding.node";
+          fullyQualifiedName="$(pwd)/$parent/${name}_binding.node";
           mv "$file" "$parent/${name}_binding.node";
           echo -e "New filename\072 $fullyQualifiedName";
           ./scripts/upload-github-release-asset.sh github_api_token=$AUTH_TOKEN owner=am11 repo=node-sass tag=$CIRRUS_TAG filename=$fullyQualifiedName;
