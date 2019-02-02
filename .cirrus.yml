@@ -50,7 +50,10 @@ freebsd_build_task:
       echo "$changeDir npm install --unsafe-perm" | $execPrefix /bin/sh
 
 publish_task:
-  only_if: '!!$CIRRUS_TAG'
+
+  only_if: $CIRRUS_TAG != ''
+
+  depends_on: freebsd_build
 
   env:
     AUTH_TOKEN: ENCRYPTED[a5dff23246b1739033647812162c802c324eedf8976f2c5fa0af549de6b3a243141a94460652f542cbe24465ee628f9c]
