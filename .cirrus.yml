@@ -25,6 +25,9 @@ freebsd_build_task:
         jailName: j11i386
         execPrefix: cbsd jexec jname=j11i386
 
+  env:
+    AUTH_TOKEN: ENCRYPTED[a5dff23246b1739033647812162c802c324eedf8976f2c5fa0af549de6b3a243141a94460652f542cbe24465ee628f9c]
+
   prepare_script:
     - |
       if test "$abi" = "freebsd:11:x86:32"; then
@@ -49,22 +52,16 @@ freebsd_build_task:
       fi
       echo "$changeDir npm install --unsafe-perm" | $execPrefix /bin/sh
 
-publish_task:
-
-  only_if: $CIRRUS_TAG != ''
-
-  depends_on: freebsd_build
-
-  env:
-    AUTH_TOKEN: ENCRYPTED[a5dff23246b1739033647812162c802c324eedf8976f2c5fa0af549de6b3a243141a94460652f542cbe24465ee628f9c]
-
-  script:
-    - curl -s -d '{"tag_name":"$CIRRUS_TAG"}' -H "Authorization:token $AUTH_TOKEN" https://api.github.com/repos/am11/node-sass/releases > null
-    - for file in `ls vendor/**/*.node`; do
-        parent=${file%/*};
-        name=${parent##*/};
-        fullyQualifiedName="$pwd/$parent/${name}_binding.node";
-        mv "$file" "$parent/${name}_binding.node";
-        echo -e 'New filename\072 $fullyQualifiedName';
-        ./scripts/upload-github-release-asset.sh github_api_token=$AUTH_TOKEN owner=am11 repo=node-sass tag=$CIRRUS_TAG filename=$fullyQualifiedName;
-      done
+  publish_script:
+    - |
+      if test "$CIRRUS_TAG" != ""; then
+        curl -s -d '{"tag_name":"$CIRRUS_TAG"}' -H "Authorization:token $AUTH_TOKEN" https://api.github.com/repos/am11/node-sass/releases > null;
+        for file in `ls vendor/**/*.node`; do
+          parent=${file%/*};
+          name=${parent##*/};
+          fullyQualifiedName="$pwd/$parent/${name}_binding.node";
+          mv "$file" "$parent/${name}_binding.node";
+          echo -e "New filename\072 $fullyQualifiedName";
+          ./scripts/upload-github-release-asset.sh github_api_token=$AUTH_TOKEN owner=am11 repo=node-sass tag=$CIRRUS_TAG filename=$fullyQualifiedName;
+        done
+      fi

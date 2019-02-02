@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 #
 # Author: Stefan Buck
 # License: MIT
@@ -22,7 +22,6 @@
 
 # Check dependencies.
 set -e
-xargs=$(which gxargs || which xargs)
 
 # Validate settings.
 [ "$TRACE" ] && set -x
@@ -41,7 +40,7 @@ AUTH="Authorization: token $github_api_token"
 WGET_ARGS="--content-disposition --auth-no-challenge --no-cookie"
 CURL_ARGS="-LJO#"
 
-if [[ "$tag" == 'LATEST' ]]; then
+if test "$tag" == "LATEST"; then
   GH_TAGS="$GH_REPO/releases/latest"
 fi
 
