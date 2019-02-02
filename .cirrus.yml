@@ -55,6 +55,7 @@ freebsd_build_task:
   publish_script:
     - |
       if test "$CIRRUS_TAG" != ""; then
+        echo curl -s -d {"tag_name":"$CIRRUS_TAG"} -H "Authorization:token $AUTH_TOKEN" https://api.github.com/repos/am11/node-sass/releases;
         curl -s -d '{"tag_name":"$CIRRUS_TAG"}' -H "Authorization:token $AUTH_TOKEN" https://api.github.com/repos/am11/node-sass/releases;
         for file in `ls vendor/**/*.node`; do
           parent=${file%/*};
