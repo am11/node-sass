@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 #
 # Author: Stefan Buck
 # License: MIT
@@ -22,6 +22,7 @@
 
 # Check dependencies.
 set -e
+xargs=$(which gxargs || which xargs)
 
 # Validate settings.
 [ "$TRACE" ] && set -x
@@ -40,14 +41,13 @@ AUTH="Authorization: token $github_api_token"
 WGET_ARGS="--content-disposition --auth-no-challenge --no-cookie"
 CURL_ARGS="-LJO#"
 
-if test "$tag" == "LATEST"; then
+if [[ "$tag" == 'LATEST' ]]; then
   GH_TAGS="$GH_REPO/releases/latest"
 fi
 
 # Validate token.
 curl -o /dev/null -sH "$AUTH" $GH_REPO || { echo "Error: Invalid repo, token or network issue!";  exit 1; }
-echo $AUTH
-curl -s -d '{"tag_name":"$CIRRUS_TAG"}' -H "Authorization:token $AUTH_TOKEN" https://api.github.com/repos/am11/node-sass/releases;
+
 # Read asset tags.
 response=$(curl -sH "$AUTH" $GH_TAGS)
 
