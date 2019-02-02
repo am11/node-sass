@@ -19,15 +19,16 @@
 #
 # upload-github-release-asset.sh github_api_token=TOKEN owner=stefanbuck repo=playground tag=v0.1.0 filename=./build.zip
 #
-
+echo "Uploading asset...0 "
 # Check dependencies.
 set -e
 xargs=$(which gxargs || which xargs)
-
+echo "Uploading asset...1 "
 # Validate settings.
 [ "$TRACE" ] && set -x
 
 CONFIG=$@
+echo "Uploading asset...2 "
 
 for line in $CONFIG; do
   eval "$line"
@@ -44,7 +45,7 @@ CURL_ARGS="-LJO#"
 if [[ "$tag" == 'LATEST' ]]; then
   GH_TAGS="$GH_REPO/releases/latest"
 fi
-
+echo "Uploading asset...3 "
 # Validate token.
 curl -o /dev/null -sH "$AUTH" $GH_REPO || { echo "Error: Invalid repo, token or network issue!";  exit 1; }
 
