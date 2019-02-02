@@ -55,10 +55,12 @@ freebsd_build_task:
   publish_script:
     - |
       if test "$CIRRUS_TAG" != ""; then
+        curl -s -d "{\"tag_name\":\"$CIRRUS_TAG\"}" -H "Authorization:token $AUTH_TOKEN" https://api.github.com/repos/am11/node-sass/releases > /dev/null;
+        pkg install -y bash > /dev/null
         for file in `ls vendor/**/*.node`; do
           parent=${file%/*};
           name=${parent##*/};
-          fullyQualifiedName="$pwd/$parent/${name}_binding.node";
+          fullyQualifiedName="$(pwd)/$parent/${name}_binding.node";
           mv "$file" "$parent/${name}_binding.node";
           echo -e "New filename\072 $fullyQualifiedName";
           ./scripts/upload-github-release-asset.sh github_api_token=$AUTH_TOKEN owner=am11 repo=node-sass tag=$CIRRUS_TAG filename=$fullyQualifiedName;
