@@ -6,17 +6,17 @@ freebsd_build_task:
   env:
     matrix:
       - node_js: "11"
-        nodePattern: "^node-11.*V8"
-        npmPattern: "^npm-6\\."
+        nodeTxzPattern: '/"node-11/s/.*"\(node-11[^"]*\).*/\1/p'
+        npmTxzPattern: '/"npm-6/s/.*"\(npm-6[^"]*\).*/\1/p'
       - node_js: "10"
-        nodePattern: "^node10-.*V8"
-        npmPattern: "^npm-node10-"
+        nodeTxzPattern: '/"node10-/s/.*"\(node10-[^"]*\).*/\1/p'
+        npmTxzPattern: '/"npm-node10-/s/.*"\(npm-node10-[^"]*\).*/\1/p'
       - node_js: "8"
-        nodePattern: "^node8-.*V8"
-        npmPattern: "^npm-node8-"
+        nodeTxzPattern: '/"node8-/s/.*"\(node8-[^"]*\).*/\1/p'
+        npmTxzPattern: '/"npm-node8-/s/.*"\(npm-node8-[^"]*\).*/\1/p'
       - node_js: "6"
-        nodePattern: "^node6-.*V8"
-        npmPattern: "^npm-node6-"
+        nodeTxzPattern: '/"node6-/s/.*"\(node6-[^"]*\).*/\1/p'
+        npmTxzPattern: '/"npm-node6-/s/.*"\(npm-node6-[^"]*\).*/\1/p'
 
   env:
     matrix:
@@ -34,13 +34,17 @@ freebsd_build_task:
         ./scripts/configure_freebsd_ci_jail.sh $jailName $CIRRUS_WORKING_DIR;
         $execPrefix sed -i -- '' 's/quarterly/latest/g' /etc/pkg/FreeBSD.conf;
         $execPrefix pkg update -f;
-        $execPrefix pkg install -y python2 > /dev/null
+        $execPrefix pkg install -y python2 > /dev/null;
       else
         sed -i '' 's/quarterly/latest/g' /etc/pkg/FreeBSD.conf;
       fi
     - $execPrefix pkg install -y c-ares gmake icu libnghttp2 libuv git > /dev/null
-    - $execPrefix pkg add http://pkg.freebsd.org/$abi/latest/All/$(pkg search node | grep $nodePattern | cut -d' ' -f 1).txz
-    - $execPrefix pkg add http://pkg.freebsd.org/$abi/latest/All/$(pkg search npm | grep $npmPattern | cut -d' ' -f 1).txz
+    - |
+      fetch http://pkg.freebsd.org/$abi/latest/All/ -o list
+      nodeTxz=$(sed -n "$nodeTxzPattern" list);
+      npmTxz=$(sed -n "$npmTxzPattern" list);
+      $execPrefix pkg add http://pkg.freebsd.org/$abi/latest/All/$nodeTxz;
+      $execPrefix pkg add http://pkg.freebsd.org/$abi/latest/All/$npmTxz;
     - $execPrefix node --version
     - $execPrefix npm --version
     - $execPrefix clang++ --version
